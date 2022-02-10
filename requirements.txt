@@ -1,0 +1,5 @@
+django
+
+drf-yasg
+django-rest-swagger
+django-cors-headers

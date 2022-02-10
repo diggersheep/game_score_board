@@ -1,0 +1,138 @@
+{% load static %}
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport"
+        content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Controls</title>
+
+  <meta charset="UTF-8">
+  <meta name="viewport"
+        content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous" />
+
+  <style>
+    .container-fluid .team-card {
+        border-radius: 10px;
+        padding: 5px;
+    }
+    .container-fluid .team-card div, .container-fluid .team-card button {
+        border-radius: 10px;
+    }
+    .leader {
+        border-color: #4D4
+    }
+  </style>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+  <div class="container-fluid">
+    <h1>Controls</h1>
+  </div>
+</nav>
+
+<div class="container-fluid">
+
+
+  {% for team in teams %}
+
+  <div class="card team-card mt-4" id="card_{{ team.id }}">
+    <div class="row">
+      <div class="col-4">
+        <button class="btn w-100" style="background: {{ team.color }};">{{ team.color }}</button>
+      </div>
+      <div class="col-4">
+        <p>score sub: <span id="sub_score_{{ team.id }}">{{ team.sub_score }}</span></p>
+        <p>score: <span id="score_{{ team.id }}">{{ team.score }}</span></p>
+      </div>
+      <div class="col-2">
+        <button class="btn btn-secondary" onclick="change_score({{ team.id }}, true)">+</button>
+      </div>
+      <div class="col-2 mr-0">
+        <button class="btn btn-danger" onclick="change_score({{ team.id }}, false)">-</button>
+      </div>
+    </div>
+  </div>
+
+  {% endfor %}
+  <div>
+  <div class="text-center mt-4">
+    <button id="close_set" class="btn btn-primary">Clore la manche</button>
+  </div>
+
+  </div>
+</div>
+
+</body>
+<script>
+
+const teams_id = [{% for team in teams %}{{ team.id }},{% endfor %}]
+
+function refresh_score_team(team_id, score, sub_score) {
+  score_item = document.getElementById("score_" + team_id).innerText = "" + score
+  sub_score_item = document.getElementById("sub_score_" + team_id).innerText = "" + sub_score
+}
+
+function change_score(team_id, add) {
+  let url = "/api/team/" + team_id + "/" + ((add) ? "add" : "sub")
+  let msg = "" + ((add) ? "Ajouter" : "Enlever") + " 1 point à cette équipe ?"
+
+  if ( confirm(msg) ) {
+    fetch(url)
+        .then(response => response.json())
+        .then(response => {
+            refresh_score_team(response.id, response.score, response.sub_score)
+        })
+        .catch(error => {
+          alert("Erreur sur l'équipe #" + team_id + " avec l'opération '" + ((add) ? "add" : "sub") + "'"
+        )
+    })
+  }
+}
+
+function close_set() {
+  const url = "/api/team/close_set"
+  if ( confirm("Clore la manche ?") ) {
+    fetch(url)
+      .then(response => response.json())
+      .then(response => {
+        response.teams.forEach(team => refresh_score_team(team.id, team.score, team.sub_score))
+        get_team_leader()
+
+        alert("Gagnant du jeu: " + response.winners.join(", "))
+      })
+  }
+}
+
+function get_team_leader() {
+  const url = "/api/team/score_leader"
+  fetch(url)
+    .then(response => response.json())
+    .then(response => {
+        console.log(response)
+        let leaders_idx = response.leaders
+        let basic_classes = "card team-card mt-4"
+        teams_id.forEach(team_id => {
+            let card = document.getElementById("card_" + team_id)
+            console.log(card)
+            if ( leaders_idx.includes(team_id) ) {
+              card.setAttribute("class", basic_classes + " leader")
+            }
+            else {
+              card.setAttribute("class", basic_classes)
+            }
+        })
+    })
+}
+
+(() => {
+    document.getElementById("close_set").addEventListener("click", event => { close_set() })
+    get_team_leader()
+})()
+</script>
+</html>
