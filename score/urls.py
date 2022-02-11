@@ -11,10 +11,12 @@ class Home(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        n = Team.objects.all().count()
+        teams = Team.objects.all()
+        n = teams.count()
         context.update({
             "team_range": range(n),
             "n": n,
+            "teams": teams,
         })
         return context
 

@@ -45,9 +45,13 @@ html, body {
 
 .score_card { border-radius: 10px; }
 .score { font-size: 4em; }
-.subscore { font-size: 10em; }
+.subscore {
+    font-size: 10em;
+}
 
-
+.shake_fx {
+    animation: subScoreShake 400ms;
+}
 
 /*******************\
 |    ANIMATIONS     |
@@ -64,4 +68,18 @@ html, body {
 	100% {
 		background-position: 0% 50%;
 	}
+}
+
+@keyframes subScoreShake {
+    0% { transform: rotate(0deg); }
+    10% { transform: rotate(5deg); }
+    20% { transform: rotate(-5deg); }
+    30% { transform: rotate(5deg); }
+    40% { transform: rotate(-5deg); }
+    50% { transform: rotate(5deg); }
+    60% { transform: rotate(-5deg); }
+    70% { transform: rotate(5deg); }
+    80% { transform: rotate(-5deg); }
+    90% { transform: rotate(5deg); }
+    95% { transform: rotate(0deg); }
 }

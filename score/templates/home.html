@@ -29,8 +29,8 @@
 <div class="main_background"></div>
 <div class="content row">
 
-  {% for i in team_range %}
-    {% if i == 0 and n == 3 %}
+  {% for team in teams %}
+    {% if forloop.counter0 == 0 and n == 3 %}
       <div class="col-3"></div>
     {% endif %}
     <div class="p-4 col-6">
@@ -40,8 +40,8 @@
 
         <div class="score_card card col-8">
           <div class="card-body text-center">
-            <div class="score score_font" id="score_{{ i }}">0</div>
-            <div class="subscore subscore_font" id="sub_score_{{ i }}">0</div>
+            <div class="score score_font" id="score_{{ team.id }}">0</div>
+            <div class="subscore subscore_font" id="sub_score_{{ team.id }}">0</div>
           </div>
         </div>
 
@@ -57,26 +57,40 @@
 </body>
 <script>
 const n_teams = {{ n }}
+const team_idx = [{% for team in teams %}{{ team.id }}, {% endfor %}]
 
 function load_teams() {
   fetch("/api/team").then(response => {
     if (response.ok) { return response.json() }
   }).then(data => {
-      for ( i = 0 ; i < n_teams ; i++ ) {
-          load_on_team(data[i], i)
-      }
+      team_idx.forEach((team_id, i) => {
+          load_on_team(data[i])
+      })
   })
 }
 
-function load_on_team (team, i) {
-    score = document.getElementById("score_" + i)
+function shake_score(team_id, for_score) {
+  let basic_classes = (for_score) ? "score score_font" : "subscore subscore_font"
+  let element_id = "" + ((for_score) ? "score_": "sub_score_") + team_id
+  let element = document.getElementById(element_id)
+
+  element.setAttribute("class", basic_classes + " shake_fx")
+}
+
+function load_on_team (team) {
+    let score = document.getElementById("score_" + team.id)
+    let old_score = score.innerText
     score.innerText = team.score
 
-    subscore = document.getElementById("sub_score_" + i)
+    subscore = document.getElementById("sub_score_" + team.id)
+    let old_subscore = subscore.innerText
     subscore.innerText = team.sub_score
 
     score.style = "color: " + team.color + ";"
     subscore.style = "color: " + team.color + ";"
+
+    console.log("" + old_subscore + " :: " + team.sub_score)
+    if ( old_subscore < team.sub_score ) { shake_score(team.id, false) }
 }
 
 (() => {
