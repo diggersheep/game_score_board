@@ -38,7 +38,7 @@
       <div class="row">
         <div class="col-2"></div>
 
-        <div class="score_card card col-8">
+        <div class="score_card card col-8" id="team_{{ team.id }}">
           <div class="card-body text-center">
             <div class="score score_font" id="score_{{ team.id }}">0</div>
             <div class="subscore subscore_font" id="sub_score_{{ team.id }}">0</div>
@@ -58,13 +58,18 @@
 <script>
 const n_teams = {{ n }}
 const team_idx = [{% for team in teams %}{{ team.id }}, {% endfor %}]
+const load_delay = 2000
 
-function load_teams() {
+const sub_score_animation_duration = 400
+const score_animation_duration = 750
+
+
+function load_teams(first=false) {
   fetch("/api/team").then(response => {
     if (response.ok) { return response.json() }
   }).then(data => {
       team_idx.forEach((team_id, i) => {
-          load_on_team(data[i])
+          load_on_team(data[i], first)
       })
   })
 }
@@ -75,9 +80,19 @@ function shake_score(team_id, for_score) {
   let element = document.getElementById(element_id)
 
   element.setAttribute("class", basic_classes + " shake_fx")
+  setTimeout((e) => {element.setAttribute("class", basic_classes)}, sub_score_animation_duration + 1000)
 }
 
-function load_on_team (team) {
+function invert_score(team_id) {
+  let basic_classes = "score_card card col-8"
+  let element_id = "team_" + team_id
+  let element = document.getElementById(element_id)
+
+  element.setAttribute("class", basic_classes + " invert_fx")
+  setTimeout((e) => {element.setAttribute("class", basic_classes)}, score_animation_duration + 1000)
+}
+
+function load_on_team (team, first=false) {
     let score = document.getElementById("score_" + team.id)
     let old_score = score.innerText
     score.innerText = team.score
@@ -89,13 +104,15 @@ function load_on_team (team) {
     score.style = "color: " + team.color + ";"
     subscore.style = "color: " + team.color + ";"
 
-    console.log("" + old_subscore + " :: " + team.sub_score)
-    if ( old_subscore < team.sub_score ) { shake_score(team.id, false) }
+    if ( !first ) {
+      if ( old_subscore < team.sub_score ) { shake_score(team.id, false) }
+      if ( old_score < team.score ) { invert_score(team.id) }
+    }
 }
 
 (() => {
-  load_teams()
-  setInterval(load_teams, 2000)
+  load_teams(first=true)
+  setInterval(load_teams, load_delay)
 })()
 </script>
 </html>
