@@ -37,7 +37,7 @@
 </nav>
 
 <div class="container-fluid">
-
+  <h2>Teams</h2>
 
   {% for team in teams %}
 
@@ -62,7 +62,29 @@
   {% endfor %}
   <div>
   <div class="text-center mt-4">
-    <button id="close_set" class="btn btn-primary">Clore la manche</button>
+    <div>
+      <button id="close_set" class="btn btn-primary">Clore la manche</button>
+    </div>
+    <br>
+    <br>
+    <div>
+      <button id="reset_teams" class="btn btn-danger">Reset tous les scores</button>
+    </div>
+  </div>
+  <br>
+  <br>
+  <br>
+  <br>
+
+  <div>
+    <h2>Transitions</h2>
+    <div class="text-center mt-4">
+    {% for transition in transitions %}
+      <div>
+        <button class="btn btn-primary" onclick="set_transition({{ transition.id }})">{{ transition.name }}</button>
+      </div>
+    {% endfor %}
+    </div>
   </div>
 
   </div>
@@ -130,8 +152,33 @@ function get_team_leader() {
     })
 }
 
+function reset_score() {
+  const url = "/api/team/reset"
+  if ( confirm("Réinitialiser les scores ?") ) {
+    fetch(url)
+      .then(response => response.json())
+      .then(response => {
+        response.teams.forEach(team => refresh_score_team(team.id, team.score, team.sub_score))
+        get_team_leader()
+      })
+  }
+}
+
+const set_transition = (transition_id) => {
+  const url = `/api/transition/${transition_id}/set_active`
+  if ( confirm("Lancer la transition ?") ) {
+    fetch(url)
+      .then(response => response.json())
+      .then(data => {
+        console.log(data)
+      })
+  }
+}
+
 (() => {
     document.getElementById("close_set").addEventListener("click", event => { close_set() })
+    document.getElementById("reset_teams").addEventListener("click", event => { reset_score() })
+
     get_team_leader()
 })()
 </script>

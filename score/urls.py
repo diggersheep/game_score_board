@@ -1,9 +1,11 @@
 from django.contrib import admin
 from django.urls import path, include
 
+from django.contrib.sessions.models import Session
+
 from django.views.generic import TemplateView
 
-from score.core.models import Team
+from score.core.models import Team, Transition
 
 
 class Home(TemplateView):
@@ -20,6 +22,7 @@ class Home(TemplateView):
         })
         return context
 
+
 class ControlsView(TemplateView):
     template_name = "controls.html"
 
@@ -27,8 +30,10 @@ class ControlsView(TemplateView):
         context = super().get_context_data(**kwargs)
         context.update({
             "teams": Team.objects.all(),
+            "transitions": Transition.objects.all(),
         })
         return context
+
 
 urlpatterns = [
     path("", Home.as_view()),
@@ -36,3 +41,4 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("api/", include("score.core.urls")),
 ]
+
