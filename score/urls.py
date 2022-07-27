@@ -35,10 +35,11 @@ class ControlsView(TemplateView):
         return context
 
 
+# scoreboard is the root
 urlpatterns = [
-    path("", Home.as_view()),
-    path("controls", ControlsView.as_view()),
-    path("admin/", admin.site.urls),
-    path("api/", include("score.core.urls")),
+    path("scoreboard", Home.as_view()),
+    path("scoreboard/controls", ControlsView.as_view()),
+    path("scoreboard/admin/", admin.site.urls),
+    path("scoreboard/api/", include("score.core.urls")),
 ]
 

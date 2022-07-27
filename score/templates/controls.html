@@ -101,7 +101,7 @@ function refresh_score_team(team_id, score, sub_score) {
 }
 
 function change_score(team_id, add) {
-  let url = "/api/team/" + team_id + "/" + ((add) ? "add" : "sub")
+  let url = "/scoreboard/api/team/" + team_id + "/" + ((add) ? "add" : "sub")
   let msg = "" + ((add) ? "Ajouter" : "Enlever") + " 1 point à cette équipe ?"
 
   if ( confirm(msg) ) {
@@ -118,7 +118,7 @@ function change_score(team_id, add) {
 }
 
 function close_set() {
-  const url = "/api/team/close_set"
+  const url = "/scoreboard/api/team/close_set"
   if ( confirm("Clore la manche ?") ) {
     fetch(url)
       .then(response => response.json())
@@ -132,7 +132,7 @@ function close_set() {
 }
 
 function get_team_leader() {
-  const url = "/api/team/score_leader"
+  const url = "/scoreboard/api/team/score_leader"
   fetch(url)
     .then(response => response.json())
     .then(response => {
@@ -153,7 +153,7 @@ function get_team_leader() {
 }
 
 function reset_score() {
-  const url = "/api/team/reset"
+  const url = "/scoreboard/api/team/reset"
   if ( confirm("Réinitialiser les scores ?") ) {
     fetch(url)
       .then(response => response.json())
@@ -165,7 +165,7 @@ function reset_score() {
 }
 
 const set_transition = (transition_id) => {
-  const url = `/api/transition/${transition_id}/set_active`
+  const url = `/scoreboard/api/transition/${transition_id}/set_active`
   if ( confirm("Lancer la transition ?") ) {
     fetch(url)
       .then(response => response.json())

@@ -74,7 +74,7 @@ const sub_score_animation_duration = 400
 const score_animation_duration = 750
 
 function load_teams(first=false) {
-  fetch("/api/team").then(response => {
+  fetch("scoreboard/api/team").then(response => {
     if (response.ok) { return response.json() }
   }).then(data => {
       team_idx.forEach((team_id, i) => {
@@ -141,20 +141,22 @@ function triggerFX(initPos, background, text) {
   txt.style.left = initPos.left
 
   txt_content.style.background = text.background
+  txt_content.style.color = text.color
 
   txt_content.innerText = text.content
     console.log(text.content)
     console.log(txt_content)
 
   bg.style.background = background.background
-  {#txt.style.background = "black"#}
-  txt.style.color = text.color
 
   bg.style.animation = "" + background.fx + " " + background.duration + "ms " + background.method
   txt.style.animation = "" + text.fx + " " + text.duration + "ms " + text.method
 
+  /*
   console.log("" + background.fx + " " + background.duration + "ms " + background.method)
   console.log("" + text.fx + " " + text.duration + "ms " + text.method)
+  console.log("" + text.color + " -> " + text.background)
+  */
 
   setTimeout(() => {
     bg.style.animation = ""
@@ -187,7 +189,7 @@ function trigger_fx() {
 }
 
 const get_transition = () => {
-  const url = "/api/transition/current"
+  const url = "scoreboard/api/transition/current"
   fetch(url)
     .then(response => response.json())
     .then(data => {
