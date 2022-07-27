@@ -10,7 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.0/ref/settings/
 """
 import os
-from os.path import dirname, abspath, basename
+from os.path import dirname, abspath, basename, normpath, join
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -20,6 +20,7 @@ DJANGO_ROOT = dirname(dirname(abspath(__file__)))
 DJANGO_ROOT = BASE_DIR
 SITE_ROOT = dirname(DJANGO_ROOT)
 SITE_NAME = basename(DJANGO_ROOT)
+
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
@@ -64,7 +65,7 @@ ROOT_URLCONF = 'score.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(DJANGO_ROOT, "score", 'templates')],
+        'DIRS': [os.path.join(DJANGO_ROOT, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -76,7 +77,9 @@ TEMPLATES = [
         },
     },
 ]
-
+print(
+    TEMPLATES[0]['DIRS']
+)
 WSGI_APPLICATION = 'score.wsgi.application'
 
 
@@ -89,7 +92,6 @@ DATABASES = {
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/4.0/ref/settings/#auth-password-validators
@@ -125,10 +127,14 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.0/howto/static-files/
 
-STATIC_URL = 'static/'
+
+STATIC_ROOT = normpath(join(SITE_ROOT, 'assets'))
+STATIC_URL = '/site_media/'
 STATICFILES_DIRS = [
-    BASE_DIR / "score" / STATIC_URL,
+    normpath(join(DJANGO_ROOT, 'static')),
 ]
+
+
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
