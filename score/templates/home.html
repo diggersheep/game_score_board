@@ -10,6 +10,7 @@
   <title>Document</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous" />
   <link rel="stylesheet" href="{% static "css/home.css" %}" />
+  <link rel="stylesheet" href="{% static "css/animations.css" %}" />
 
   <style>
     @font-face {
@@ -20,17 +21,23 @@
         font-family: "score outline";
         src: url({% static 'fonts/CollegiateOutlineFLF.ttf' %}) format("truetype");
     }
+    @font-face {
+        font-family: "collegiate";
+        src: url({% static 'fonts/CollegiateFLF.ttf' %}) format("truetype");
+    }
     .score_font { font-family: "score", sans-serif; }
     .subscore_font { font-family: "score outline", sans-serif; }
   </style>
 </head>
 <body>
-
 <div class="main_background"></div>
-<div class="content row">
+<div
+    class="content row"
+    {% if n == 2 %}style="top: 25%; height: 75%;"{%  endif %}
+>
 
-  {% for i in team_range %}
-    {% if i == 0 and n == 3 %}
+  {% for team in teams %}
+    {% if forloop.counter0 == 0 and n == 3 %}
       <div class="col-3"></div>
     {% endif %}
     <div class="p-4 col-6">
@@ -38,10 +45,10 @@
       <div class="row">
         <div class="col-2"></div>
 
-        <div class="score_card card col-8">
+        <div class="score_card card col-8" id="team_{{ team.id }}">
           <div class="card-body text-center">
-            <div class="score score_font" id="score_{{ i }}">0</div>
-            <div class="subscore subscore_font" id="sub_score_{{ i }}">0</div>
+            <div class="score score_font" id="score_{{ team.id }}">0</div>
+            <div class="subscore subscore_font" id="sub_score_{{ team.id }}">0</div>
           </div>
         </div>
 
@@ -52,36 +59,160 @@
 
 
 </div>
-<div id="transition_panel"></div>
+<div id="transition_panel">
+  <div id="bg_panel"></div>
+  <div id="text_panel" class="text-center">
+    <p id="text_panel_content">Texte de la transition<br>Hello world</p>
+  </div>
+</div>
 
 </body>
 <script>
 const n_teams = {{ n }}
+const team_idx = [{% for team in teams %}{{ team.id }}, {% endfor %}]
+const load_delay = 1000
 
-function load_teams() {
-  fetch("/api/team").then(response => {
+const sub_score_animation_duration = 400
+const score_animation_duration = 750
+
+const load_teams = (first=false) => {
+  fetch("scoreboard/api/team").then(response => {
     if (response.ok) { return response.json() }
   }).then(data => {
-      for ( i = 0 ; i < n_teams ; i++ ) {
-          load_on_team(data[i], i)
-      }
+      team_idx.forEach((team_id, i) => {
+          load_on_team(data[i], first)
+      })
   })
 }
 
-function load_on_team (team, i) {
-    score = document.getElementById("score_" + i)
+const shake_score = (team_id, for_score) => {
+  let basic_classes = (for_score) ? "score score_font" : "subscore subscore_font"
+  let element_id = "" + ((for_score) ? "score_": "sub_score_") + team_id
+  let element = document.getElementById(element_id)
+
+  element.setAttribute("class", basic_classes + " shake_fx")
+  setTimeout((e) => {element.setAttribute("class", basic_classes)}, sub_score_animation_duration + 1000)
+}
+
+const invert_score = (team_id) => {
+  let basic_classes = "score_card card col-8"
+  let element_id = "team_" + team_id
+  let element = document.getElementById(element_id)
+
+  element.setAttribute("class", basic_classes + " invert_fx")
+  setTimeout((e) => {element.setAttribute("class", basic_classes)}, score_animation_duration + 1000)
+}
+
+const load_on_team = (team, first=false) => {
+    let score = document.getElementById("score_" + team.id)
+    let old_score = score.innerText
     score.innerText = team.score
 
-    subscore = document.getElementById("sub_score_" + i)
+    let subscore = document.getElementById("sub_score_" + team.id)
+    let old_subscore = subscore.innerText
     subscore.innerText = team.sub_score
 
     score.style = "color: " + team.color + ";"
     subscore.style = "color: " + team.color + ";"
+
+    if ( !first ) {
+      if ( old_subscore < team.sub_score ) { shake_score(team.id, false) }
+      if ( old_score < team.score ) { invert_score(team.id) }
+    }
+}
+
+const clearStyle = (element) => {element.removeAttribute("style")}
+
+/**
+ * @param initPos {top, left}
+ * @param background {background, fx, duration, method}
+ * @param text {background, color, content, fx, duration, method}
+ */
+const triggerFX = (initPos, background, text) => {
+  let bg = document.getElementById("bg_panel")
+  let txt = document.getElementById("text_panel")
+  let txt_content = document.getElementById("text_panel_content")
+
+  let max_delay = (background.duration > text.duration) ? background.duration : text.duration
+
+  bg.style.top = initPos.top
+  bg.style.left = initPos.left
+  txt.style.top = initPos.top
+  txt.style.left = initPos.left
+
+  txt_content.style.background = text.background
+  txt_content.style.color = text.color
+
+  txt_content.innerText = text.content
+
+  bg.style.background = background.background
+
+  bg.style.animation = "" + background.fx + " " + background.duration + "ms " + background.method
+  txt.style.animation = "" + text.fx + " " + text.duration + "ms " + text.method
+
+  setTimeout(() => {
+    bg.style.animation = ""
+    txt.style.animation = ""
+    bg.style.background = ""
+    txt.style.background = ""
+    txt_content.style.background = ""
+    txt_content.innerText = ""
+  }, max_delay + 1000)
+}
+
+const trigger_fx = () => {
+    triggerFX(
+      initPos={top: "0", left: "-100%"},
+      background={
+          background: "red",
+          fx: "slideLeftToRight",
+          duration: 4000,
+          method: "ease"
+      },
+      text={
+          background: "orange",
+          color: "white",
+          content: "This is my transition",
+          fx: "slideLeftToRightText",
+          duration: 4000,
+          method: "ease"
+      }
+  )
+}
+
+const get_transition = () => {
+  const url = "scoreboard/api/transition/current"
+  fetch(url)
+    .then(response => response.json())
+    .then(data => {
+        if ( data.data !==  null ) {
+          const parameters = data.data.parameters
+          triggerFX(
+            initPos={top: "0", left: "-100%"},
+            background=parameters.background,
+            text=parameters.text,
+          )
+        }
+    })
 }
 
 (() => {
-  load_teams()
-  setInterval(load_teams, 2000)
+  load_teams(first=true)
+  setInterval(load_teams, load_delay)
+  setInterval(get_transition, load_delay)
+
+  /*
+  triggerFX(
+      initPos={top: "0", left: "-100%"},
+      background={
+          background: "red", fx: "slideLeftToRight",
+          duration: 4000, method: "ease" },
+      text={background: "orange", color: "white",
+          content: "This is my transition", fx: "slideLeftToRightText",
+          duration: 4000, method: "ease"
+      })
+  */
 })()
+
 </script>
 </html>

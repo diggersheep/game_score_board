@@ -1,0 +1,5 @@
+.idea
+db.sqlite3
+**/__pycache__/**
+score/settings/prod.py
+score/settings/dev.py

@@ -1,0 +1,77 @@
+[
+{
+  "model": "core.team",
+  "pk": 1,
+  "fields": {
+    "color": "#2ECC71",
+    "score": 0,
+    "sub_score": 0
+  }
+},
+{
+  "model": "core.team",
+  "pk": 2,
+  "fields": {
+    "color": "#1F4690",
+    "score": 0,
+    "sub_score": 0
+  }
+},
+{
+  "model": "core.team",
+  "pk": 3,
+  "fields": {
+    "color": "#E74C3C",
+    "score": 0,
+    "sub_score": 0
+  }
+},
+{
+  "model": "core.transition",
+  "pk": 1,
+  "fields": {
+    "name": "Manche du reverse",
+    "parameters": {
+      "background": {
+        "method": "ease",
+        "fx": "slideLeftToRight",
+        "duration": 5000,
+        "background": "#2ECC71"
+      },
+      "text": {
+        "method": "ease",
+        "fx": "slideLeftToRightText",
+        "duration": 5000,
+        "background": "#FFF",
+        "color": "#2ECC71",
+        "content": "Le Reverse"
+      }
+    },
+    "active": false
+  }
+},
+{
+  "model": "core.transition",
+  "pk": 2,
+  "fields": {
+    "name": "manche du Plagia ou Sample",
+    "parameters": {
+      "background": {
+        "method": "ease",
+        "fx": "slideLeftToRight",
+        "duration": 5000,
+        "background": "#39d5ff"
+      },
+      "text": {
+        "method": "ease",
+        "fx": "slideLeftToRightText",
+        "duration": 5000,
+        "background": "#f1c40f",
+        "color": "#102770",
+        "content": "Plagia ou Sample"
+      }
+    },
+    "active": false
+  }
+}
+]

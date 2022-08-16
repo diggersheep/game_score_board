@@ -1,3 +1,6 @@
+import json
+from typing import Any, Dict
+
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
@@ -9,3 +12,12 @@ class Team(models.Model):
 
     def __str__(self) -> str:
         return f"{self.color} {self.score}::{self.sub_score}"
+
+
+class Transition(models.Model):
+    name = models.CharField(_("Name"), max_length=32, blank=False, null=False)
+    parameters = models.JSONField(_("Parameters"), blank=False, null=False, default=dict)
+    active = models.BooleanField(_("Active"), default=False)
+
+    def __str__(self) -> str:
+        return self.name

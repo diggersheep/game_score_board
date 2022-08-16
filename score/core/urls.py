@@ -16,6 +16,11 @@ urlpatterns = [
 
     path("team/<int:pk>", views.TeamViewUpdate.as_view()),
     path("team/<int:pk>/<op>", views.AddSubTeamAPIView.as_view()),
+
+    path("team/reset", views.TeamReset.as_view()),
+
+    path("transition/current", views.GetActiveTransition.as_view()),
+    path("transition/<int:pk>/set_active", views.SetActiveTransition.as_view()),
 ]
 
 

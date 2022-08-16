@@ -1,0 +1,15 @@
+@keyframes slideLeftToRight {
+    0% { left: -100%; }
+    25% { left: 0; }
+
+    75% { left: 0; }
+    100% { left: 100%; }
+}
+
+@keyframes slideLeftToRightText {
+    0% { left: -100%; }
+    10% { left: 0; }
+
+    90% { left: 0; }
+    100% { left: 100%; }
+}
