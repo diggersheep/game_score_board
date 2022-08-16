@@ -30,9 +30,11 @@
   </style>
 </head>
 <body>
-
 <div class="main_background"></div>
-<div class="content row">
+<div
+    class="content row"
+    {% if n == 2 %}style="top: 25%; height: 75%;"{%  endif %}
+>
 
   {% for team in teams %}
     {% if forloop.counter0 == 0 and n == 3 %}
@@ -73,7 +75,7 @@ const load_delay = 1000
 const sub_score_animation_duration = 400
 const score_animation_duration = 750
 
-function load_teams(first=false) {
+const load_teams = (first=false) => {
   fetch("scoreboard/api/team").then(response => {
     if (response.ok) { return response.json() }
   }).then(data => {
@@ -83,7 +85,7 @@ function load_teams(first=false) {
   })
 }
 
-function shake_score(team_id, for_score) {
+const shake_score = (team_id, for_score) => {
   let basic_classes = (for_score) ? "score score_font" : "subscore subscore_font"
   let element_id = "" + ((for_score) ? "score_": "sub_score_") + team_id
   let element = document.getElementById(element_id)
@@ -92,7 +94,7 @@ function shake_score(team_id, for_score) {
   setTimeout((e) => {element.setAttribute("class", basic_classes)}, sub_score_animation_duration + 1000)
 }
 
-function invert_score(team_id) {
+const invert_score = (team_id) => {
   let basic_classes = "score_card card col-8"
   let element_id = "team_" + team_id
   let element = document.getElementById(element_id)
@@ -101,12 +103,12 @@ function invert_score(team_id) {
   setTimeout((e) => {element.setAttribute("class", basic_classes)}, score_animation_duration + 1000)
 }
 
-function load_on_team (team, first=false) {
+const load_on_team = (team, first=false) => {
     let score = document.getElementById("score_" + team.id)
     let old_score = score.innerText
     score.innerText = team.score
 
-    subscore = document.getElementById("sub_score_" + team.id)
+    let subscore = document.getElementById("sub_score_" + team.id)
     let old_subscore = subscore.innerText
     subscore.innerText = team.sub_score
 
@@ -119,21 +121,19 @@ function load_on_team (team, first=false) {
     }
 }
 
-function clearStyle(emement) {
-  element.removeAttribute("style")
-}
+const clearStyle = (element) => {element.removeAttribute("style")}
 
 /**
  * @param initPos {top, left}
  * @param background {background, fx, duration, method}
  * @param text {background, color, content, fx, duration, method}
  */
-function triggerFX(initPos, background, text) {
+const triggerFX = (initPos, background, text) => {
   let bg = document.getElementById("bg_panel")
   let txt = document.getElementById("text_panel")
   let txt_content = document.getElementById("text_panel_content")
 
-  max_delay = (background.duration > text.duration) ? background.duration : text.duration
+  let max_delay = (background.duration > text.duration) ? background.duration : text.duration
 
   bg.style.top = initPos.top
   bg.style.left = initPos.left
@@ -144,19 +144,11 @@ function triggerFX(initPos, background, text) {
   txt_content.style.color = text.color
 
   txt_content.innerText = text.content
-    console.log(text.content)
-    console.log(txt_content)
 
   bg.style.background = background.background
 
   bg.style.animation = "" + background.fx + " " + background.duration + "ms " + background.method
   txt.style.animation = "" + text.fx + " " + text.duration + "ms " + text.method
-
-  /*
-  console.log("" + background.fx + " " + background.duration + "ms " + background.method)
-  console.log("" + text.fx + " " + text.duration + "ms " + text.method)
-  console.log("" + text.color + " -> " + text.background)
-  */
 
   setTimeout(() => {
     bg.style.animation = ""
@@ -168,7 +160,7 @@ function triggerFX(initPos, background, text) {
   }, max_delay + 1000)
 }
 
-function trigger_fx() {
+const trigger_fx = () => {
     triggerFX(
       initPos={top: "0", left: "-100%"},
       background={
